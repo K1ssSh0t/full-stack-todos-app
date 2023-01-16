@@ -14,7 +14,7 @@ export default function NewTask() {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    const userID = session.user.id;
+    const userID = session?.user.id;
 
     const { error } = await supabase
       .from("todos")
