@@ -1,53 +1,46 @@
+import "server-only";
+
+import { createServerClient } from "../utils/supabase-server";
+import NewTask from "./new-task";
 import Image from "next/image";
+
+import Tasks from "./tasks";
+
 import { Inter } from "@next/font/google";
-import styles from "./page.module.css";
+import Footer from "./footer";
+import Login from "./login";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export const revalidate = 0;
+export default async function Home() {
+  const supabase = createServerClient();
+
+  const { data: user } = await supabase.auth.getUser();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const userId = user.user?.id;
+
+  const { data: todos } = await supabase
+    .from("todos")
+    .select("*")
+    .eq("user_id", userId);
+
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://app.supabase.com">Supabase</a> on{" "}
-          <a href="https://nextjs.org">Next.js 13!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="/optional-session" className={styles.card}>
-            <h2>Optional Session &rarr;</h2>
-            <p>Visit this page with or without a session.</p>
-          </a>
-
-          <a href="/required-session" className={styles.card}>
-            <h2>Required Session &rarr;</h2>
-            <p>Get redirected if you don't have a session.</p>
-          </a>
-
-          <a href="/realtime" className={styles.card}>
-            <h2>Realtime &rarr;</h2>
-            <p>Merge server and client state with realtime.</p>
-          </a>
-        </div>
+    <div className=" p-8">
+      <main className=" min-h-[100vh]">
+        {session ? (
+          <>
+            <NewTask />
+            <Tasks tasksList={todos || []} />
+          </>
+        ) : (
+          <Login />
+        )}
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }

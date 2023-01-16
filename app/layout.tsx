@@ -5,7 +5,8 @@ import { createServerClient } from "../utils/supabase-server";
 import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../types/supabase";
 import SupabaseProvider from "../components/supabase-provider";
-import Login from "../components/login";
+import Login from "../components/user-data";
+import "tailwindcss/tailwind.css";
 
 export const revalidate = 0;
 
@@ -28,6 +29,7 @@ export default async function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
+
       <body>
         <SupabaseProvider session={session}>
           <SupabaseListener serverAccessToken={session?.access_token} />
